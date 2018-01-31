@@ -10,6 +10,7 @@ project(drive_base_tutorial)
 find_package(catkin REQUIRED COMPONENTS
   geometry_msgs
   roscpp
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -150,6 +151,8 @@ include_directories(
 # )
 add_executable(drive_base src/drive_base.cpp)
 target_link_libraries(drive_base ${catkin_LIBRARIES})
+add_executable(drive_base_odom src/drive_base_odom.cpp)
+target_link_libraries(drive_base_odom ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
