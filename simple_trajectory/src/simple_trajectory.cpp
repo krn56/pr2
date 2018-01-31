@@ -34,6 +34,70 @@ public:
         traj_client_->sendGoal(goal);
     }
 
+    // generates a simple trajectory with two waypoints
+    pr2_controllers_msgs::JointTrajectoryGoal armExtensionTrajectory(){
+        // our goal variables
+        pr2_controllers_msgs::JointTrajectoryGoal goal;
+
+        // First, the joint names, which apply to all waypoints
+        goal.trajectory.joint_names.push_back("r_shoulder_pan_joint");
+        goal.trajectory.joint_names.push_back("r_shoulder_lift_joint");
+        goal.trajectory.joint_names.push_back("r_upper_arm_roll_joint");
+        goal.trajectory.joint_names.push_back("r_elbow_flex_joint");
+        goal.trajectory.joint_names.push_back("r_forearm_roll_joint");
+        goal.trajectory.joint_names.push_back("r_wrist_flex_joint");
+        goal.trajectory.joint_names.push_back("r_wrist_roll_joint");
+
+        // we will have two waypoints in this goal trajectory
+        goal.trajectory.points.resize(2);
+
+        // First trajectory point
+        // Positions
+        int ind = 0;
+        goal.trajectory.points[ind].positions.resize(7);
+        goal.trajectory.points[ind].positions[0] = 0.0;
+        goal.trajectory.points[ind].positions[1] = 0.0;
+        goal.trajectory.points[ind].positions[2] = 0.0;
+        goal.trajectory.points[ind].positions[3] = 0.0;
+        goal.trajectory.points[ind].positions[4] = 0.0;
+        goal.trajectory.points[ind].positions[5] = 0.0;
+        goal.trajectory.points[ind].positions[6] = 0.0;
+
+        // Velocities
+        goal.trajectory.points[ind].velocities.resize(7);
+        for(size_t j = 0; j < 7; j++){
+            goal.trajectory.points[ind].velocities[j] = 0.0;
+        }
+        // to be reached 1 second after starting along the trajectory
+        goal.trajectory.points[ind].time_from_start = ros::Duration(1.0);
+
+        // Second trajectory point
+        // Positions
+        ind += 1;
+        goal.trajectory.points[ind].positions.resize(7);
+        goal.trajectory.points[ind].positions[0] = -0.3;
+        goal.trajectory.points[ind].positions[1] = 0.2;
+        goal.trajectory.points[ind].positions[2] = -0.1;
+        goal.trajectory.points[ind].positions[3] = -1.2;
+        goal.trajectory.points[ind].positions[4] = 1.5;
+        goal.trajectory.points[ind].positions[5] = -0.3;
+        goal.trajectory.points[ind].positions[6] = 0.5;
+        // Velocities
+        goal.trajectory.points[ind].velocities.resize(7);
+        for(size_t j = 0; j < 7; j++){
+            goal.trajectory.points[ind].velocities[j] = 0.0;
+        }
+        // to be reached 2 seconds after starting along the trajectory
+        goal.trajectory.points[ind].time_from_start = ros::Duration(2.0);
+
+        // return goal
+        return goal;
+    }
+
+    // Returns the current state of teh action
+    actionlib::SimpleClientGoalState getState(){
+        return traj_client_->getState();
+    }
 
 };
 
@@ -44,5 +108,10 @@ int main(int argc, char** argv){
     RobotArm arm;
 
     //start the trajectory
-    arm.startTrajectory(arm.arm)
+    arm.startTrajectory(arm.armExtensionTrajectory());
+    //wait for trajectory completion
+    while(!arm.getState().isDone() && ros::ok()){
+        usleep(50000);
+    }
+    return 0;
 }
