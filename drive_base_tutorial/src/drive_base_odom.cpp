@@ -18,13 +18,13 @@ public:
     RobotDriver(ros::NodeHandle &nh){
         nh_ = nh;
         //set up the publisher
-        cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel", 1);
+        cmd_vel_pub_ = nh_.advertise<geometry_msgs::Twist>("base_controller/command", 1);
     }
 
     // drive forward based on odometry information
     bool driveForwardOdom(double distance){
         // wait for the listener to get the first message
-        listener_.waitForTransform("base_footprint", "odom_combined", ros::Time(0), ros::Duration(1.0));
+        listener_.waitForTransform("base_footprint", "odom_combined", ros::Time(0), ros::Duration(10000.0));
 
         // we will record transforms here
         tf::StampedTransform start_transform;
@@ -71,6 +71,5 @@ int main(int argc, char** argv){
     ros::NodeHandle nh;
 
     RobotDriver driver(nh);
-    double distance = strtol(argv[1], NULL, 10);
-    driver.driveForwardOdom(distance);
+    driver.driveForwardOdom(0.5);
 }
