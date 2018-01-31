@@ -2,7 +2,6 @@
 #include <ros/ros.h>
 #include <geometry_msgs/Twist.h>
 #include <tf/transform_listener.h>
-#include <stdlib.h>
 
 class RobotDriver{
 private:
@@ -24,7 +23,7 @@ public:
     // drive forward based on odometry information
     bool driveForwardOdom(double distance){
         // wait for the listener to get the first message
-        listener_.waitForTransform("base_footprint", "odom_combined", ros::Time(0), ros::Duration(10000.0));
+        listener_.waitForTransform("base_footprint", "odom_combined", ros::Time(0), ros::Duration(1000.0));
 
         // we will record transforms here
         tf::StampedTransform start_transform;
@@ -63,6 +62,61 @@ public:
         if(done) return true;
         return false;
     }
+    \
+    bool turnOdom(bool clockwise, double radians){
+        while(radians  < 0) radians += 2*M_PI;
+        while(radians > 2*M_PI) radians -= 2*M_PI;
+
+        // wait for the listener to get the first message
+        listener_.waitForTransform("base_footprint", "odom_combined", ros::Time(0), ros::Duration(1000.0));
+
+        // record the transforms
+        tf::StampedTransform start_trasnform;
+        tf::StampedTransform current_transform;
+
+        // record starting transform from the odometry to the base frame
+        listener_.lookupTransform("base_footprint", "odom_combined", ros::Time(0), start_trasnform);
+
+        // send command type "twist"
+        geometry_msgs::Twist base_cmd;
+        // command to turn at 0.75 rad/s
+        base_cmd.linear.x = base_cmd.linear.y = 0.0;
+        base_cmd.angular.z = 0.75;
+        if (clockwise) base_cmd.angular.z = -base_cmd.angular.z;
+
+        // axis we want to be rotating by
+        tf::Vector3 desired_turn_axis(0,0,1);
+        if(!clockwise) desired_turn_axis = -desired_turn_axis;
+
+        ros::Rate rate(10.0);
+        bool done = false;
+        while(!done && nh_.ok()){
+            // send the drive command
+            cmd_vel_pub_.publish(base_cmd);
+            rate.sleep();
+
+            // get the current transform
+            try{
+                listener_.lookupTransform("base_footprint", "odom_combined", ros::Time(0), current_transform);
+            }
+            catch(tf::TransformException ex){
+                ROS_ERROR("%s", ex.what());
+                break;
+            }
+            tf::Transform relative_transform = start_trasnform.inverse() * current_transform;
+            tf::Vector3 actual_turn_axis = relative_transform.getRotation().getAxis();
+            double angle_turned = relative_transform.getRotation().getAngle();
+            if(fabs(angle_turned) < 1.0e-2) continue;
+            if(actual_turn_axis.dot(desired_turn_axis) < 0){
+                angle_turned = 2 * M_PI - angle_turned;
+            }
+
+            if(angle_turned > radians) done = true;
+        }
+
+        if(done) return true;
+        return false;
+    }
 };
 
 int main(int argc, char** argv){
@@ -72,4 +126,5 @@ int main(int argc, char** argv){
 
     RobotDriver driver(nh);
     driver.driveForwardOdom(0.5);
+    driver.turnOdom(true, 0.5);
 }
