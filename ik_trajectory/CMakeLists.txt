@@ -58,11 +58,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ add_service_files(
+   FILES
+   ExecuteCartesianIKTrajectory.srv
+ )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -153,7 +152,8 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-
+add_executable(ik_trajectory src/ik_trajectory.cpp)
+target_link_libraries(ik_trajectory ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
