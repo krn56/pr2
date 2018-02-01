@@ -7,7 +7,7 @@
 #include <actionlib/client/simple_action_client.h>
 #include <kinematics_msgs/GetPositionIK.h>
 #include <kinematics_msgs/GetPositionFK.h>
-#include <pr2/ik_trajectory/ExecuteCartesianIKTrajectory.h>
+#include <ik_trajectory/ExecuteCartesianIKTrajectory.h>
 #include <vector>
 
 #define MAX_JOINT_VEL 0.5 // in radians/sec
