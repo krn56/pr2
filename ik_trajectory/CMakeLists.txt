@@ -15,6 +15,7 @@ find_package(catkin REQUIRED COMPONENTS
   pr2_controllers_msgs
   roscpp
   tf
+  message_generation
 )
 
 ## System dependencies are found with CMake's conventions
@@ -71,10 +72,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   kinematics_msgs#   pr2_controllers_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   geometry_msgs
+   std_msgs #   kinematics_msgs#   pr2_controllers_msgs
+ )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

@@ -44,6 +44,24 @@ public:
         while(ros::ok() && !action_client->waitForServer(ros::Duration(5.0))){
             ROS_INFO("Waiting for the joint_trajectory_action action server to come up");
         }
+
+        // register a service to input desired Cartesian trajectories
+        service = node.advertiseService("execute_cartesian_ik_trajectory", &IKTrajectoryExecutor::execute_cartesian_ik_trajectory, this);
+
+        // specify the order of the joints we're sending
+        // joint trajectory goal
+        goal.trajectory.joint_names.push_back("r_shoulder_pan_joint");
+        goal.trajectory.joint_names.push_back("r_shoulder_lift_joint");
+        goal.trajectory.joint_names.push_back("r_upper_arm_roll_joint");
+        goal.trajectory.joint_names.push_back("r_elbow_flex_joint");
+        goal.trajectory.joint_names.push_back("r_forearm_roll_joint");
+        goal.trajectory.joint_names.push_back("r_wrist_flex_joint");
+        goal.trajectory.joint_names.push_back("r_wrist_roll_joint");
+
+    }
+
+    ~IKTrajectoryExecutor(){
+        delete action_client;
     }
 };
 
