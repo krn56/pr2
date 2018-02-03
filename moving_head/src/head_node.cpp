@@ -1,0 +1,85 @@
+#include <ros/ros.h>
+#include <actionlib/client/simple_action_client.h>
+#include <pr2_controllers_msgs/PointHeadAction.h>
+
+// action interface type
+typedef actionlib::SimpleActionClient <pr2_controllers_msgs::PointHeadAction> PointHeadClient;
+
+class RobotHead{
+
+private:
+    PointHeadClient* point_head_client_;
+
+public:
+
+    // action client intialization
+    RobotHead(){
+
+    // initialize the client for the action interface to the head controller
+    point_head_client_ = new PointHeadClient("/head_traj_controller/point_head_action", true);
+
+    // wait for head controller action server to come up
+    while(!point_head_client_->waitForServer(ros::Duration(5.0))){
+        ROS_INFO("Waiting for the point_head_action server to come up");
+    }
+    }
+
+    ~RobotHead(){
+        delete point_head_client_;
+    }
+
+    // points camera frame at a point in a given frame
+    void lookAt(std::string frame_id, double x, double y, double z){
+
+        // goal message
+        pr2_controllers_msgs::PointHeadGoal goal;
+
+        //target point
+        geometry_msgs::PointStamped point;
+        point.header.frame_id = frame_id;
+        point.point.x = x;
+        point.point.y = y;
+        point.point.z = z;
+        goal.target = point;
+
+        // pointing camera frame
+        // pointing axis defaults to x axis
+        goal.pointing_frame = "high_def_frame";
+        goal.pointing_axis.x = 1;
+        goal.pointing_axis.y = 0;
+        goal.pointing_axis.z = 0;
+
+        // take at least 0.5 seconds to get there
+        goal.min_duration = ros::Duration(0.5);
+
+        // go no faster than 1 rad/s
+        goal.max_velocity = 1.0;
+
+        // send the goal
+        point_head_client_->sendGoal(goal);
+
+        // wait for it to get there
+        point_head_client_->waitForResult(ros::Duration(2.0));
+    }
+
+    // shake the head from left to right n times
+    void shakeHead(int n){
+        int count = 0;
+        while(ros::ok() && ++count <= n){
+            // looks at a point
+            lookAt("base_link", 5.0, 1.0, 1.2);
+
+            // looks at a point
+            lookAt("base_link", 5.0, -1.0, 1.2);
+        }
+    }
+};
+
+int main(int argc, char** argv){
+
+    // init the ROS node
+    ros::init(argc, argv, "head_node");
+
+    RobotHead head;
+    head.shakeHead(3);
+}
