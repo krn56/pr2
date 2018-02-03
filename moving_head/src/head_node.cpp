@@ -82,4 +82,10 @@ int main(int argc, char** argv){
 
     RobotHead head;
     head.shakeHead(3);
+
+    while(ros::ok()){
+        // follows the right gripper
+        head.lookAt("r_gripper_tool_frame", 0, 0, 0);
+        usleep(50000);
+    }
 }
