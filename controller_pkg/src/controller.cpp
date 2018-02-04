@@ -36,3 +36,6 @@ void MyControllerClass::update(){
 void MyControllerClass::stopping(){}
 }
 
+PLUGINLIB_DECLARE_CLASS(controller_pkg, MuControllerPlugin, my_controller_ns::MyControllerClass,pr2_controller_interface::Controller)
+
+

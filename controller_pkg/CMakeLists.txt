@@ -102,12 +102,12 @@ find_package(catkin REQUIRED COMPONENTS
 ## LIBRARIES: libraries you create in this project that dependent projects also need
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
-catkin_package(
-  INCLUDE_DIRS include
-  LIBRARIES controller_pkg
-  CATKIN_DEPENDS pluginlib pr2_controller_interface pr2_mechanism_model
-  DEPENDS system_lib
-)
+#catkin_package(
+#  INCLUDE_DIRS include
+#  LIBRARIES controller_pkg
+#  CATKIN_DEPENDS pluginlib pr2_controller_interface pr2_mechanism_model
+#  DEPENDS system_lib
+#)
 
 ###########
 ## Build ##
@@ -121,9 +121,9 @@ include_directories(
 )
 
 ## Declare a C++ library
-# add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/include/controller.hpp
-# )
+ add_library(${PROJECT_NAME}
+   src/controller.cpp
+ )
 
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
@@ -149,8 +149,8 @@ include_directories(
 # target_link_libraries(${PROJECT_NAME}_node
 #   ${catkin_LIBRARIES}
 # )
-add_executable(controller src/controller.cpp)
-target_link_libraries(controller ${catkin_LIBRARIES})
+#add_executable(controller src/controller.cpp)
+#target_link_libraries(controller ${catkin_LIBRARIES})
 #############
 ## Install ##
 #############
@@ -173,11 +173,11 @@ target_link_libraries(controller ${catkin_LIBRARIES})
 # )
 
 ## Mark cpp header files for installation
- install(DIRECTORY include/${PROJECT_NAME}/
-   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-   FILES_MATCHING PATTERN "*.h"
-   PATTERN ".svn" EXCLUDE
- )
+# install(DIRECTORY include/${PROJECT_NAME}/
+#   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
+#   FILES_MATCHING PATTERN "*.h"
+#   PATTERN ".svn" EXCLUDE
+# )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 # install(FILES
