@@ -3,7 +3,7 @@
 
 namespace my_controller_ns {
 
-/// controller initialization in non-realtime
+// controller initialization in non-realtime
 bool MyControllerClass::init(pr2_mechanism_model::RobotState *robot, ros::NodeHandle &n){
     std::string joint_name;
     if(!n.getParam("joint_name", joint_name)){
@@ -19,23 +19,23 @@ bool MyControllerClass::init(pr2_mechanism_model::RobotState *robot, ros::NodeHa
     return true;
 }
 
-/// controller startup in realtime
+// controller startup in realtime
 void MyControllerClass::starting(){
     init_pos_ = joint_state_->position_;
 }
 
 
-/// controller update loop in realtime
+// controller update loop in realtime
 void MyControllerClass::update(){
     double desired_pos = init_pos_ + 15 * sin(ros::Time::now().toSec());
     double current_pos = joint_state_->position_;
     joint_state_->commanded_effort_ = -10 * (current_pos - desired_pos);
 }
 
-/// controller stopping in realtime
+// controller stopping in realtime
 void MyControllerClass::stopping(){}
 }
 
-PLUGINLIB_DECLARE_CLASS(controller_pkg, MuControllerPlugin, my_controller_ns::MyControllerClass,pr2_controller_interface::Controller)
+PLUGINLIB_DECLARE_CLASS(controller_pkg, MyControllerPlugin, my_controller_ns::MyControllerClass,pr2_controller_interface::Controller)
 
 
